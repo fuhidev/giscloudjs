@@ -10,7 +10,7 @@ export function splitWords(str) {
   return trim(str).split(/\s+/);
 }
 
-export const stringUtil = {
+export const StringUtil = {
   splitWords,
   trim,
 };

@@ -1,5 +1,5 @@
-import { coreUtil } from '../utils/core.util';
-import { stringUtil } from '../utils/string.util';
+import { CoreUtil } from '../utils/core.util';
+import { StringUtil } from '../utils/string.util';
 
 export interface IEvent {
   fn: (e: any) => any;
@@ -20,7 +20,7 @@ export class Evented {
       }
     } else {
       // types can be a string of space-separated words
-      types = stringUtil.splitWords(types);
+      types = StringUtil.splitWords(types);
 
       for (let i = 0, len = types.length; i < len; i++) {
         this.onOneType(types[i], fn, context);
@@ -65,7 +65,7 @@ export class Evented {
         this.offOneType(type, types[type], fn);
       }
     } else {
-      types = stringUtil.splitWords(types);
+      types = StringUtil.splitWords(types);
 
       const removeAll = arguments.length === 1;
       for (let i = 0, len = types.length; i < len; i++) {
@@ -121,7 +121,7 @@ export class Evented {
     }
   }
 
-  fire(type, data, propagate) {
+  fire(type: string, data?, propagate?) {
     if (!this.listens(type, propagate)) {
       return this;
     }
@@ -219,7 +219,7 @@ export class Evented {
       }
     } else {
       // types can be a string of space-separated words
-      types = stringUtil.splitWords(types);
+      types = StringUtil.splitWords(types);
 
       for (let i = 0, len = types.length; i < len; i++) {
         this.onOneType(types[i], fn, context, true);
@@ -232,7 +232,7 @@ export class Evented {
   // @method addEventParent(obj: Evented): this
   // Adds an event parent - an `Evented` that will receive propagated events
   addEventParent(obj) {
-    this.eventParents.set(coreUtil.stamp(obj), obj);
+    this.eventParents.set(CoreUtil.stamp(obj), obj);
     return this;
   }
 
@@ -240,7 +240,7 @@ export class Evented {
   // Removes an event parent, so it will stop receiving propagated events
   removeEventParent(obj) {
     if (this.eventParents) {
-      this.eventParents.delete(coreUtil.stamp(obj));
+      this.eventParents.delete(CoreUtil.stamp(obj));
     }
     return this;
   }

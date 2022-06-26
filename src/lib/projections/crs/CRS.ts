@@ -4,7 +4,7 @@ import { LatLng } from '../../geometry/support/LatLng';
 import { LatLngBounds } from '../../geometry/support/LatLngBounds';
 import { Transformation } from '../../geometry/Transformation';
 
-import { numberUtil } from '../../utils/number.util';
+import { NumberUtil } from '../../utils/number.util';
 import { Projection } from '../Projection';
 
 export abstract class CRS {
@@ -102,10 +102,10 @@ export abstract class CRS {
   // CRS's `wrapLat` and `wrapLng` properties, if they are outside the CRS's bounds.
   wrapLatLng(latlng: LatLng) {
     const lng = this.wrapLng
-        ? numberUtil.wrapNum(latlng.lng, this.wrapLng, true)
+        ? NumberUtil.wrapNum(latlng.lng, this.wrapLng, true)
         : latlng.lng,
       lat = this.wrapLat
-        ? numberUtil.wrapNum(latlng.lat, this.wrapLat, true)
+        ? NumberUtil.wrapNum(latlng.lat, this.wrapLat, true)
         : latlng.lat,
       alt = latlng.alt;
 

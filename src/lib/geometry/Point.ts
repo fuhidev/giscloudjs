@@ -22,7 +22,7 @@
  * can't be added to it with the `include` function.
  */
 
-import { numberUtil } from '../utils/number.util';
+import { NumberUtil } from '../utils/number.util';
 
 import { Geometry } from './Geometry';
 
@@ -129,9 +129,9 @@ export class Point extends Geometry {
   toString() {
     return (
       'Point(' +
-      numberUtil.formatNum(this.x) +
+      NumberUtil.formatNum(this.x) +
       ', ' +
-      numberUtil.formatNum(this.y) +
+      NumberUtil.formatNum(this.y) +
       ')'
     );
   }

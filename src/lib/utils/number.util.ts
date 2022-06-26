@@ -21,7 +21,7 @@ function wrapNum(x: number, range: [number, number], includeMax?: boolean) {
   return x === max && includeMax ? x : ((((x - min) % d) + d) % d) + min;
 }
 
-export const numberUtil = {
+export const NumberUtil = {
   formatNum,
   wrapNum,
 };

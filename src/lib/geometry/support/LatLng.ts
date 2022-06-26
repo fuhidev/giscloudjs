@@ -1,5 +1,5 @@
 import { EarthCRS } from '../../projections/crs/Earth.CRS';
-import { numberUtil } from '../../utils/number.util';
+import { NumberUtil } from '../../utils/number.util';
 
 import { LatLngBounds } from './LatLngBounds';
 
@@ -32,9 +32,9 @@ export class LatLng {
   toString(precision) {
     return (
       'LatLng(' +
-      numberUtil.formatNum(this.lat, precision) +
+      NumberUtil.formatNum(this.lat, precision) +
       ', ' +
-      numberUtil.formatNum(this.lng, precision) +
+      NumberUtil.formatNum(this.lng, precision) +
       ')'
     );
   }

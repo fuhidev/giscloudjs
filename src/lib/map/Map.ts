@@ -1,12 +1,15 @@
 import { Accessor } from '../core/Accessor';
 import { Collection } from '../core/collections/Collection';
+import { LatLng } from '../geometry/support/LatLng';
+import { LatLngBounds } from '../geometry/support/LatLngBounds';
 import { Layer } from '../layers/layer';
 import { CRS } from '../projections/crs/CRS';
+import { EPSG3857 } from '../projections/crs/EPSG3857.CRS';
 
 export interface MapOptions {
   crs: CRS;
   layers: Collection<Layer>;
-  center: [number, number];
+  center: LatLng | [number, number];
   zoom: number;
   minZoom: number;
   maxZoom: number;
@@ -89,9 +92,131 @@ export interface MapOptions {
  *
  */
 export class Map extends Accessor {
-  crs:
-  constructor(options:MapOptions){
+  crs: CRS;
+  center: LatLng;
+  zoom: number;
+  minZoom: number;
+  maxZoom: number;
+  layers: Array<Layer> = [];
+  maxBounds: LatLngBounds;
+  zoomAnimation = true;
+  zoomAnimationThreshold = 4;
+  fadeAnimation = true;
+  markerZoomAnimation = true;
+  transform3DLimit = 8388608;
+  zoomSnap = 1;
+  zoomDelta = 1;
+  trackResize: true;
+  _handlers: any[];
+  _layers: {};
+  _zoomBoundLayers: {};
+  _sizeChanged: boolean;
+  _onResize: any;
+  _zoom: any;
+  _zoomAnimated: any;
+  options: any;
+  constructor(options: MapOptions) {
     super();
+    this.crs = new EPSG3857();
+    if (options.center) {
+      if (Array.isArray(options.center)) {
+        this.center = new LatLng({
+          lng: options.center[0],
+          lat: options.center[1],
+        });
+      } else if (options.center instanceof LatLng) {
+        this.center = options.center;
+      }
+    }
+    this._handlers = [];
+    this._layers = {};
+    this._zoomBoundLayers = {};
+    this._sizeChanged = true;
 
+    this._initContainer(id);
+    this._initLayout();
+
+    // hack for https://github.com/Leaflet/Leaflet/issues/1980
+    this._onResize = Util.bind(this._onResize, this);
+
+    this._initEvents();
+
+    if (options.maxBounds) {
+      this.setMaxBounds(options.maxBounds);
+    }
+
+    if (options.zoom !== undefined) {
+      this._zoom = this._limitZoom(options.zoom);
+    }
+
+    if (options.center && options.zoom !== undefined) {
+      this.setView(toLatLng(options.center), options.zoom, { reset: true });
+    }
+
+    this.callInitHooks();
+
+    // don't animate on browsers without hardware-accelerated transitions or old Android/Opera
+    this._zoomAnimated =
+      DomUtil.TRANSITION &&
+      Browser.any3d &&
+      !Browser.mobileOpera &&
+      this.options.zoomAnimation;
+
+    // zoom transitions run with the same duration for all layers, so if one of transitionend events
+    // happens after starting zoom animation (propagating to the map pane), we know that it ended globally
+    if (this._zoomAnimated) {
+      this._createAnimProxy();
+      DomEvent.on(
+        this._proxy,
+        DomUtil.TRANSITION_END,
+        this._catchTransitionEnd,
+        this
+      );
+    }
+
+    this._addLayers(this.options.layers);
+  }
+  _initContainer(id: any) {
+    throw new Error('Method not implemented.');
+  }
+  _initLayout() {
+    throw new Error('Method not implemented.');
+  }
+  _initEvents() {
+    throw new Error('Method not implemented.');
+  }
+  setMaxBounds(maxBounds: never) {
+    throw new Error('Method not implemented.');
+  }
+  _limitZoom(zoom: number): any {
+    throw new Error('Method not implemented.');
+  }
+  setView(arg0: any, zoom: number, arg2: { reset: boolean }) {
+    throw new Error('Method not implemented.');
+  }
+  callInitHooks() {
+    throw new Error('Method not implemented.');
+  }
+  _createAnimProxy() {
+    throw new Error('Method not implemented.');
+  }
+  _proxy(
+    _proxy: any,
+    TRANSITION_END: any,
+    _catchTransitionEnd: any,
+    arg3: this
+  ) {
+    throw new Error('Method not implemented.');
+  }
+  _catchTransitionEnd(
+    _proxy: any,
+    TRANSITION_END: any,
+    _catchTransitionEnd: any,
+    arg3: this
+  ) {
+    throw new Error('Method not implemented.');
+  }
+  _addLayers(layers: any) {
+    throw new Error('Method not implemented.');
   }
 }
