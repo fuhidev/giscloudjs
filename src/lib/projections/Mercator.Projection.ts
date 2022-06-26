@@ -9,9 +9,9 @@ export class MercatorPrj extends Projection {
 
   getBounds() {
     return new Bounds({
-      min: new Point({ x: -20037508.34279, y: -15496570.73972 }),
+      topLeft: new Point({ x: -20037508.34279, y: -15496570.73972 }),
 
-      max: new Point({ x: 20037508.34279, y: 18764656.23138 }),
+      bottomRight: new Point({ x: 20037508.34279, y: 18764656.23138 }),
     });
   }
 

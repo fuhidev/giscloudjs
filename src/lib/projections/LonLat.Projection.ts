@@ -12,8 +12,8 @@ export class LongLatPrj extends Projection {
   }
   getBounds(): Bounds {
     return new Bounds({
-      min: new Point({ x: -180, y: -90 }),
-      max: new Point({ x: 180, y: 90 }),
+      topLeft: new Point({ x: -180, y: -90 }),
+      bottomRight: new Point({ x: 180, y: 90 }),
     });
   }
 }

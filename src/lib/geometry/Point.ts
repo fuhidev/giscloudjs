@@ -33,19 +33,28 @@ export interface PointOptions {
 
 export class Point extends Geometry {
   // @property x: Number; The `x` coordinate of the point
-  x: number;
+  x = 0;
   // @property y: Number; The `y` coordinate of the point
-  y: number;
-  constructor(options: PointOptions) {
+  y = 0;
+  constructor(options?: PointOptions) {
     super();
-    this.x = options.x;
-    this.y = options.y;
+    if (options) {
+      this.x = options.x;
+      this.y = options.y;
+    }
   }
 
   // @method clone(): Point
   // Returns a copy of the current point.
   clone(): Point {
     return new Point({ x: this.x, y: this.y });
+  }
+
+  trunc() {
+    const target = this.clone();
+    target.x = Math.trunc(target.x);
+    target.y = Math.trunc(target.y);
+    return this;
   }
 
   // @method add(otherPoint: Point): Point
@@ -64,6 +73,13 @@ export class Point extends Geometry {
     target.x -= point.x;
     target.y -= point.y;
     return target;
+  }
+
+  round() {
+    const target = this.clone();
+    target.x = Math.round(target.x);
+    target.y = Math.round(target.y);
+    return this;
   }
 
   // @method divideBy(num: Number): Point

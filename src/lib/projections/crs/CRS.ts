@@ -74,7 +74,7 @@ export abstract class CRS {
       min = this.transformation.transform(b.min, s),
       max = this.transformation.transform(b.max, s);
 
-    return new Bounds({ min, max });
+    return new Bounds({ topLeft: min, bottomRight: max });
   }
 
   // @method distance(latlng1: LatLng, latlng2: LatLng): Number
@@ -131,6 +131,8 @@ export abstract class CRS {
       newSw = new LatLng({ lat: sw.lat - latShift, lng: sw.lng - lngShift }),
       newNe = new LatLng({ lat: ne.lat - latShift, lng: ne.lng - lngShift });
 
-    return new LatLngBounds(newSw, newNe);
+    return new LatLngBounds({ southWest: newSw, northEast: newNe });
   }
+
+  abstract distance(latlng1: LatLng, latlng2: LatLng): number;
 }

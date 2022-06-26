@@ -66,7 +66,7 @@ function getStyle(el, style) {
 
 // @function create(tagName: String, className?: String, container?: HTMLElement): HTMLElement
 // Creates an HTML element with `tagName`, sets its class to `className`, and optionally appends it to `container` element.
-function create(tagName, className, container) {
+function create(tagName: string, className: string, container?: HTMLElement) {
   const el = document.createElement(tagName);
   el.className = className || '';
 

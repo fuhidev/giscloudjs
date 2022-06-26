@@ -26,8 +26,8 @@ import { Point } from './Point';
  */
 
 export interface BoundsOptions {
-  min: Point;
-  max: Point;
+  topLeft: Point;
+  bottomRight: Point;
 }
 
 export class Bounds {
@@ -38,8 +38,8 @@ export class Bounds {
   max: Point;
   // The bottom right corner of the rectangle.
   constructor(options: BoundsOptions) {
-    this.min = options.min;
-    this.max = options.max;
+    this.min = options.topLeft;
+    this.max = options.bottomRight;
   }
 
   // @method extend(point: Point): this
@@ -48,7 +48,7 @@ export class Bounds {
   // @alternative
   // @method extend(otherBounds: Bounds): this
   // Extend the bounds to contain the given bounds
-  extend(min: Point, max: Point) {
+  extend(min: Point, max?: Point) {
     if (!this.min && !this.max) {
       this.min = min.clone();
       this.max = max.clone();
@@ -169,8 +169,11 @@ export class Bounds {
       widthBuffer = Math.abs(min.y - max.y) * bufferRatio;
 
     return new Bounds({
-      min: new Point({ x: min.x - heightBuffer, y: min.y - widthBuffer }),
-      max: new Point({ x: max.x + heightBuffer, y: max.y + widthBuffer }),
+      topLeft: new Point({ x: min.x - heightBuffer, y: min.y - widthBuffer }),
+      bottomRight: new Point({
+        x: max.x + heightBuffer,
+        y: max.y + widthBuffer,
+      }),
     });
   }
 

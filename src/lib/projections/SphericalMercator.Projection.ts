@@ -35,8 +35,8 @@ export class SphericalMercatorPrj extends Projection {
   getBounds() {
     const d = SphericalMercatorPrj.R * Math.PI;
     return new Bounds({
-      min: new Point({ x: -d, y: -d }),
-      max: new Point({ x: d, y: d }),
+      topLeft: new Point({ x: -d, y: -d }),
+      bottomRight: new Point({ x: d, y: d }),
     });
   }
 }

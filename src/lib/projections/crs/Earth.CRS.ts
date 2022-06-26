@@ -12,7 +12,7 @@ export class EarthCRS extends CRS {
   }
 
   // distance between two geographical points using spherical law of cosines approximation
-  static distance(latlng1: LatLng, latlng2: LatLng) {
+  distance(latlng1: LatLng, latlng2: LatLng) {
     const rad = Math.PI / 180,
       lat1 = latlng1.lat * rad,
       lat2 = latlng2.lat * rad,
@@ -21,6 +21,6 @@ export class EarthCRS extends CRS {
       a =
         sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon,
       c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return this.R * c;
+    return EarthCRS.R * c;
   }
 }

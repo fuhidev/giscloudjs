@@ -2,7 +2,7 @@
 // @property lastId: Number
 // Last unique ID used by [`stamp()`](#util-stamp)
 let lastId = 0;
-
+('use strict');
 // @function stamp(obj: Object): Number
 // Returns the unique ID of an object, assigning it one if it doesn't have it.
 function stamp(obj) {
@@ -33,8 +33,8 @@ const cancelFn =
   function (id) {
     window.clearTimeout(id);
   };
-
-function bind(fn, obj) {
+/*eslint-disabled no-shadow-restricted-names: "error"*/
+function bind(fn, obj, ...arguments) {
   const slice = Array.prototype.slice;
 
   if (fn.bind) {
@@ -69,6 +69,7 @@ function cancelAnimFrame(id) {
 }
 export const CoreUtil = {
   stamp,
+  bind,
   cancelAnimFrame,
   requestAnimFrame,
 };
