@@ -814,7 +814,7 @@ export class DMap extends Accessor {
   // @section Other Methods
   // @method addHandler(name: String, HandlerClass): this
   // Adds a new `Handler` to the map, given its name and constructor function.
-  addHandler(name, HandlerClass) {
+  addHandler(name: string, HandlerClass) {
     if (!HandlerClass) {
       return this;
     }
