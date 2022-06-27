@@ -8,7 +8,7 @@ import { Bounds } from '../geometry/Bounds';
 import { Point } from '../geometry/Point';
 import { LatLng } from '../geometry/support/LatLng';
 import { LatLngBounds } from '../geometry/support/LatLngBounds';
-import { Layer } from '../layers/layer';
+import { Layer } from '../layers/Layer';
 import { CRS } from '../projections/crs/CRS';
 import { EPSG3857 } from '../projections/crs/EPSG3857.CRS';
 import { ArrayUtil } from '../utils/array.utils';
@@ -105,7 +105,7 @@ export class DMap extends Accessor {
   zoomDelta = 1;
   trackResize: true;
   private _handlers: any[];
-  private _layers = new Collection<Layer>();
+  private _layers: Array<Layer> = [];
   private _sizeChanged: boolean;
   private _zoom: any;
   private _zoomAnimated: any;
@@ -136,8 +136,11 @@ export class DMap extends Accessor {
   private _tempFireZoomEvent: any;
   private _proxy: any;
   private _mapPane: any;
+  _zoomBoundLayers: any;
+  _popup: any;
+  private _paneRenderers: any;
   constructor(container: HTMLDivElement, options: MapOptions) {
-    super();
+    super(options);
     this.crs = new EPSG3857();
     if (options.center) {
       if (Array.isArray(options.center)) {
@@ -150,7 +153,6 @@ export class DMap extends Accessor {
       }
     }
     this._handlers = [];
-    this._layers = {};
     this._sizeChanged = true;
 
     this._initContainer(container);
@@ -196,7 +198,144 @@ export class DMap extends Accessor {
 
     this.addMany(this.options.layers);
   }
+  // @method addLayer(layer: Layer): this
+  // Adds the given layer to the map
+  addLayer(layer) {
+    if (!layer._layerAdd) {
+      throw new Error('The provided object is not a Layer.');
+    }
 
+    const id = CoreUtil.stamp(layer);
+    if (this._layers[id]) {
+      return this;
+    }
+    this._layers[id] = layer;
+
+    layer._mapToAdd = this;
+
+    if (layer.beforeAdd) {
+      layer.beforeAdd(this);
+    }
+
+    this.whenReady(layer._layerAdd, layer);
+
+    return this;
+  }
+
+  // @method removeLayer(layer: Layer): this
+  // Removes the given layer from the map.
+  removeLayer(layer) {
+    const id = CoreUtil.stamp(layer);
+
+    if (!this._layers[id]) {
+      return this;
+    }
+
+    if (this._loaded) {
+      layer.onRemove(this);
+    }
+
+    delete this._layers[id];
+
+    if (this._loaded) {
+      this.fire('layerremove', { layer: layer });
+      layer.fire('remove');
+    }
+
+    layer._map = layer._mapToAdd = null;
+
+    return this;
+  }
+
+  // @method hasLayer(layer: Layer): Boolean
+  // Returns `true` if the given layer is currently added to the map
+  hasLayer(layer) {
+    return CoreUtil.stamp(layer) in this._layers;
+  }
+
+  /* @method eachLayer(fn, context?: Object): this
+   * Iterates over the layers of the map, optionally specifying context of the iterator function.
+   * ```
+   * map.eachLayer(function(layer){
+   *     layer.bindPopup('Hello');
+   * });
+   * ```
+   */
+  eachLayer(method, context) {
+    for (const i in this._layers) {
+      method.call(context, this._layers[i]);
+    }
+    return this;
+  }
+
+  _addLayers(layers) {
+    layers = layers ? (Array.isArray(layers) ? layers : [layers]) : [];
+
+    for (let i = 0, len = layers.length; i < len; i++) {
+      this.addLayer(layers[i]);
+    }
+  }
+
+  _addZoomLimit(layer) {
+    if (!isNaN(layer.options.maxZoom) || !isNaN(layer.options.minZoom)) {
+      this._zoomBoundLayers[CoreUtil.stamp(layer)] = layer;
+      this._updateZoomLevels();
+    }
+  }
+
+  _removeZoomLimit(layer) {
+    const id = CoreUtil.stamp(layer);
+
+    if (this._zoomBoundLayers[id]) {
+      delete this._zoomBoundLayers[id];
+      this._updateZoomLevels();
+    }
+  }
+
+  _updateZoomLevels() {
+    let minZoom = Infinity,
+      maxZoom = -Infinity;
+    const oldZoomSpan = this._getZoomSpan();
+
+    for (const i in this._zoomBoundLayers) {
+      const options = this._zoomBoundLayers[i].options;
+
+      minZoom =
+        options.minZoom === undefined
+          ? minZoom
+          : Math.min(minZoom, options.minZoom);
+      maxZoom =
+        options.maxZoom === undefined
+          ? maxZoom
+          : Math.max(maxZoom, options.maxZoom);
+    }
+
+    this._layersMaxZoom = maxZoom === -Infinity ? undefined : maxZoom;
+    this._layersMinZoom = minZoom === Infinity ? undefined : minZoom;
+
+    // @section Map state change events
+    // @event zoomlevelschange: Event
+    // Fired when the number of zoomlevels on the map is changed due
+    // to adding or removing a layer.
+    if (oldZoomSpan !== this._getZoomSpan()) {
+      this.fire('zoomlevelschange');
+    }
+
+    if (
+      this.options.maxZoom === undefined &&
+      this._layersMaxZoom &&
+      this.getZoom() > this._layersMaxZoom
+    ) {
+      this.setZoom(this._layersMaxZoom);
+    }
+    if (
+      this.options.minZoom === undefined &&
+      this._layersMinZoom &&
+      this.getZoom() < this._layersMinZoom
+    ) {
+      this.setZoom(this._layersMinZoom);
+    }
+  }
   add(layer: Layer) {
     //
   }
@@ -594,8 +733,8 @@ export class DMap extends Accessor {
       pixelPoint = this.project(latlng),
       pixelBounds = this.getPixelBounds(),
       paddedBounds = new Bounds({
-        topLeft: pixelBounds.min.add(paddingTL),
-        bottomRight: pixelBounds.max.subtract(paddingBR),
+        topLeft: pixelBounds.topLeft.add(paddingTL),
+        bottomRight: pixelBounds.bottomRight.subtract(paddingBR),
       }),
       paddedSize = paddedBounds.getSize();
 
@@ -1730,8 +1869,8 @@ export class DMap extends Accessor {
         topLeft: this.project(maxBounds.getNorthEast(), zoom),
         bottomRight: this.project(maxBounds.getSouthWest(), zoom),
       }),
-      minOffset = projectedMaxBounds.min.subtract(pxBounds.min),
-      maxOffset = projectedMaxBounds.max.subtract(pxBounds.max),
+      minOffset = projectedMaxBounds.topLeft.subtract(pxBounds.topLeft),
+      maxOffset = projectedMaxBounds.bottomRight.subtract(pxBounds.bottomRight),
       dx = this._rebound(minOffset.x, -maxOffset.x),
       dy = this._rebound(minOffset.y, -maxOffset.y);
 
@@ -1896,5 +2035,77 @@ export class DMap extends Accessor {
     this.fire('move');
 
     this._moveEnd(true);
+  }
+
+  // @method openPopup(popup: Popup): this
+  // Opens the specified popup while closing the previously opened (to make sure only one is opened at one time for usability).
+  // @alternative
+  // @method openPopup(content: String|HTMLElement, latlng: LatLng, options?: Popup options): this
+  // Creates a popup with the specified content and options and opens it in the given point on a map.
+  openPopup(popup, latlng, options) {
+    this._initOverlay(Popup, popup, latlng, options).openOn(this);
+
+    return this;
+  }
+
+  // @method closePopup(popup?: Popup): this
+  // Closes the popup previously opened with [openPopup](#map-openpopup) (or the given one).
+  closePopup(popup) {
+    popup = arguments.length ? popup : this._popup;
+    if (popup) {
+      popup.close();
+    }
+    return this;
+  }
+
+  _initOverlay(OverlayClass, content, latlng, options) {
+    let overlay = content;
+    if (!(overlay instanceof OverlayClass)) {
+      overlay = new OverlayClass(options).setContent(content);
+    }
+    if (latlng) {
+      overlay.setLatLng(latlng);
+    }
+    return overlay;
+  }
+
+  getRenderer(layer) {
+    // @namespace Path; @option renderer: Renderer
+    // Use this specific instance of `Renderer` for this path. Takes
+    // precedence over the map's [default renderer](#map-renderer).
+    let renderer =
+      layer.options.renderer ||
+      this._getPaneRenderer(layer.options.pane) ||
+      this.options.renderer ||
+      this._renderer;
+
+    if (!renderer) {
+      renderer = this._renderer = this._createRenderer();
+    }
+
+    if (!this.hasLayer(renderer)) {
+      this.addLayer(renderer);
+    }
+    return renderer;
+  }
+
+  _getPaneRenderer(name) {
+    if (name === 'overlayPane' || name === undefined) {
+      return false;
+    }
+
+    let renderer = this._paneRenderers[name];
+    if (renderer === undefined) {
+      renderer = this._createRenderer({ pane: name });
+      this._paneRenderers[name] = renderer;
+    }
+    return renderer;
+  }
+
+  _createRenderer(options?) {
+    // @namespace Map; @option preferCanvas: Boolean = false
+    // Whether `Path`s should be rendered on a `Canvas` renderer.
+    // By default, all `Path`s are rendered in a `SVG` renderer.
+    return (this.options.preferCanvas && canvas(options)) || svg(options);
   }
 }

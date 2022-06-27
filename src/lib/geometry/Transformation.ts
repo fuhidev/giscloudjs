@@ -1,3 +1,4 @@
+import { Accessor } from '../core/Accessor';
 import { Point } from './Point';
 
 export interface TransformationOptions {
@@ -23,16 +24,13 @@ export interface TransformationOptions {
  * 	p3 = transformation.untransform(p2); //  L.point(1, 2)
  * ```
  */
-export class Transformation {
+export class Transformation extends Accessor {
   a: number;
   b: number;
   c: number;
   d: number;
   constructor(options: TransformationOptions) {
-    this.a = options.a;
-    this.b = options.b;
-    this.c = options.c;
-    this.d = options.d;
+    super(options);
   }
   // @method transform(point: Point, scale?: Number): Point
   // Returns a transformed point, optionally multiplied by the given scale.

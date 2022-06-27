@@ -1,3 +1,4 @@
+import { Accessor } from '../../core/Accessor';
 import { EarthCRS } from '../../projections/crs/Earth.CRS';
 import { NumberUtil } from '../../utils/number.util';
 
@@ -9,14 +10,12 @@ export interface LatLngOptions {
   alt?: number;
 }
 
-export class LatLng {
+export class LatLng extends Accessor {
   lat: number;
   lng: number;
   alt?: number;
   constructor(options: LatLngOptions) {
-    this.lat = options.lat;
-    this.lng = options.lng;
-    this.alt = options.alt;
+    super(options);
   }
 
   equals(target: LatLng, maxMargin?: number) {

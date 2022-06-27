@@ -27,7 +27,7 @@ export abstract class DivOverlay extends Layer {
   protected _source: Layer;
   protected _removeTimeout: number;
   constructor(options: DivOverlayOptions, source?: Layer) {
-    super();
+    super(options);
     if (options.interactive !== undefined) {
       this.interactive = options.interactive;
     }

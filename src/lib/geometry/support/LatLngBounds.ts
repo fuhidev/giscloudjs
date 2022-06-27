@@ -1,3 +1,4 @@
+import { Accessor } from '../../core/Accessor';
 import { LatLng } from './LatLng';
 
 export interface LatLngBoundsOptions {
@@ -5,10 +6,11 @@ export interface LatLngBoundsOptions {
   northEast: LatLng;
 }
 
-export class LatLngBounds {
-  private _southWest: LatLng;
-  private _northEast: LatLng;
+export class LatLngBounds extends Accessor {
+  southWest: LatLng;
+  northEast: LatLng;
   constructor(options: LatLngBoundsOptions) {
+    super(options);
     const latlngs: LatLng[] = [options.southWest, options.northEast];
 
     for (let i = 0, len = latlngs.length; i < len; i++) {
@@ -17,16 +19,16 @@ export class LatLngBounds {
   }
 
   extend(obj: LatLng | LatLngBounds) {
-    const sw = this._southWest,
-      ne = this._northEast;
+    const sw = this.southWest,
+      ne = this.northEast;
     let sw2: LatLng, ne2: LatLng;
 
     if (obj instanceof LatLng) {
       sw2 = obj;
       ne2 = obj;
     } else if (obj instanceof LatLngBounds) {
-      sw2 = obj._southWest;
-      ne2 = obj._northEast;
+      sw2 = obj.southWest;
+      ne2 = obj.northEast;
 
       if (!sw2 || !ne2) {
         return this;
@@ -36,8 +38,8 @@ export class LatLngBounds {
     }
 
     if (!sw && !ne) {
-      this._southWest = new LatLng({ lat: sw2.lat, lng: sw2.lng });
-      this._northEast = new LatLng({ lat: ne2.lat, lng: ne2.lng });
+      this.southWest = new LatLng({ lat: sw2.lat, lng: sw2.lng });
+      this.northEast = new LatLng({ lat: ne2.lat, lng: ne2.lng });
     } else {
       sw.lat = Math.min(sw2.lat, sw.lat);
       sw.lng = Math.min(sw2.lng, sw.lng);
@@ -52,8 +54,8 @@ export class LatLngBounds {
   // For example, a ratio of 0.5 extends the bounds by 50% in each direction.
   // Negative values will retract the bounds.
   pad(bufferRatio: number): LatLngBounds {
-    const sw = this._southWest,
-      ne = this._northEast,
+    const sw = this.southWest,
+      ne = this.northEast,
       heightBuffer = Math.abs(sw.lat - ne.lat) * bufferRatio,
       widthBuffer = Math.abs(sw.lng - ne.lng) * bufferRatio;
 
@@ -67,21 +69,21 @@ export class LatLngBounds {
   // Returns the center point of the bounds.
   getCenter(): LatLng {
     return new LatLng({
-      lat: (this._southWest.lat + this._northEast.lat) / 2,
-      lng: (this._southWest.lng + this._northEast.lng) / 2,
+      lat: (this.southWest.lat + this.northEast.lat) / 2,
+      lng: (this.southWest.lng + this.northEast.lng) / 2,
     });
   }
 
   // @method getSouthWest(): LatLng
   // Returns the south-west point of the bounds.
   getSouthWest() {
-    return this._southWest;
+    return this.southWest;
   }
 
   // @method getNorthEast(): LatLng
   // Returns the north-east point of the bounds.
   getNorthEast() {
-    return this._northEast;
+    return this.northEast;
   }
 
   // @method getNorthWest(): LatLng
@@ -99,25 +101,25 @@ export class LatLngBounds {
   // @method getWest(): Number
   // Returns the west longitude of the bounds
   getWest() {
-    return this._southWest.lng;
+    return this.southWest.lng;
   }
 
   // @method getSouth(): Number
   // Returns the south latitude of the bounds
   getSouth() {
-    return this._southWest.lat;
+    return this.southWest.lat;
   }
 
   // @method getEast(): Number
   // Returns the east longitude of the bounds
   getEast() {
-    return this._northEast.lng;
+    return this.northEast.lng;
   }
 
   // @method getNorth(): Number
   // Returns the north latitude of the bounds
   getNorth() {
-    return this._northEast.lat;
+    return this.northEast.lat;
   }
 
   // @method contains(otherBounds: LatLngBounds): Boolean
@@ -127,8 +129,8 @@ export class LatLngBounds {
   // @method contains (latlng: LatLng): Boolean
   // Returns `true` if the rectangle contains the given point.
   contains(obj: LatLng | LatLngBounds) {
-    const sw = this._southWest,
-      ne = this._northEast;
+    const sw = this.southWest,
+      ne = this.northEast;
     let sw2: LatLng, ne2: LatLng;
 
     if (obj instanceof LatLngBounds) {
@@ -149,8 +151,8 @@ export class LatLngBounds {
   // @method intersects(otherBounds: LatLngBounds): Boolean
   // Returns `true` if the rectangle intersects the given bounds. Two bounds intersect if they have at least one point in common.
   intersects(bounds: LatLngBounds) {
-    const sw = this._southWest,
-      ne = this._northEast,
+    const sw = this.southWest,
+      ne = this.northEast,
       sw2 = bounds.getSouthWest(),
       ne2 = bounds.getNorthEast(),
       latIntersects = ne2.lat >= sw.lat && sw2.lat <= ne.lat,
@@ -162,8 +164,8 @@ export class LatLngBounds {
   // @method overlaps(otherBounds: LatLngBounds): Boolean
   // Returns `true` if the rectangle overlaps the given bounds. Two bounds overlap if their intersection is an area.
   overlaps(bounds: LatLngBounds) {
-    const sw = this._southWest,
-      ne = this._northEast,
+    const sw = this.southWest,
+      ne = this.northEast,
       sw2 = bounds.getSouthWest(),
       ne2 = bounds.getNorthEast(),
       latOverlaps = ne2.lat > sw.lat && sw2.lat < ne.lat,
@@ -191,14 +193,14 @@ export class LatLngBounds {
     }
 
     return (
-      this._southWest.equals(bounds.getSouthWest()) &&
-      this._northEast.equals(bounds.getNorthEast())
+      this.southWest.equals(bounds.getSouthWest()) &&
+      this.northEast.equals(bounds.getNorthEast())
     );
   }
 
   // @method isValid(): Boolean
   // Returns `true` if the bounds are properly initialized.
   isValid(): boolean {
-    return !!(this._southWest && this._northEast);
+    return !!(this.southWest && this.northEast);
   }
 }

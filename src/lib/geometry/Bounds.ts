@@ -1,3 +1,4 @@
+import { Accessor } from '../core/Accessor';
 import { Point } from './Point';
 
 /*
@@ -30,16 +31,15 @@ export interface BoundsOptions {
   bottomRight: Point;
 }
 
-export class Bounds {
+export class Bounds extends Accessor {
   // @property min: Point
   // The top left corner of the rectangle.
-  min: Point;
+  topLeft: Point;
   // @property max: Point
-  max: Point;
+  bottomRight: Point;
   // The bottom right corner of the rectangle.
   constructor(options: BoundsOptions) {
-    this.min = options.topLeft;
-    this.max = options.bottomRight;
+    super(options);
   }
 
   // @method extend(point: Point): this
@@ -49,14 +49,14 @@ export class Bounds {
   // @method extend(otherBounds: Bounds): this
   // Extend the bounds to contain the given bounds
   extend(min: Point, max?: Point) {
-    if (!this.min && !this.max) {
-      this.min = min.clone();
-      this.max = max.clone();
+    if (!this.topLeft && !this.bottomRight) {
+      this.topLeft = min.clone();
+      this.bottomRight = max.clone();
     } else {
-      this.min.x = Math.min(min.x, this.min.x);
-      this.max.x = Math.max(max.x, this.max.x);
-      this.min.y = Math.min(min.y, this.min.y);
-      this.max.y = Math.max(max.y, this.max.y);
+      this.topLeft.x = Math.min(min.x, this.topLeft.x);
+      this.bottomRight.x = Math.max(max.x, this.bottomRight.x);
+      this.topLeft.y = Math.min(min.y, this.topLeft.y);
+      this.bottomRight.y = Math.max(max.y, this.bottomRight.y);
     }
     return this;
   }
@@ -65,40 +65,40 @@ export class Bounds {
   // Returns the center point of the bounds.
   getCenter() {
     return new Point({
-      x: (this.min.x + this.max.x) / 2,
-      y: (this.min.y + this.max.y) / 2,
+      x: (this.topLeft.x + this.bottomRight.x) / 2,
+      y: (this.topLeft.y + this.bottomRight.y) / 2,
     });
   }
 
   // @method getBottomLeft(): Point
   // Returns the bottom-left point of the bounds.
   getBottomLeft() {
-    return new Point({ x: this.min.x, y: this.max.y });
+    return new Point({ x: this.topLeft.x, y: this.bottomRight.y });
   }
 
   // @method getTopRight(): Point
   // Returns the top-right point of the bounds.
   getTopRight() {
     // -> Point
-    return new Point({ x: this.max.x, y: this.min.y });
+    return new Point({ x: this.bottomRight.x, y: this.topLeft.y });
   }
 
   // @method getTopLeft(): Point
   // Returns the top-left point of the bounds (i.e. [`this.min`](#bounds-min)).
   getTopLeft() {
-    return this.min; // left, top
+    return this.topLeft; // left, top
   }
 
   // @method getBottomRight(): Point
   // Returns the bottom-right point of the bounds (i.e. [`this.max`](#bounds-max)).
   getBottomRight() {
-    return this.max; // right, bottom
+    return this.bottomRight; // right, bottom
   }
 
   // @method getSize(): Point
   // Returns the size of the given bounds
   getSize() {
-    return this.max.subtract(this.min);
+    return this.bottomRight.subtract(this.topLeft);
   }
 
   // @method contains(otherBounds: Bounds): Boolean
@@ -110,17 +110,17 @@ export class Bounds {
     let min: Point, max: Point;
 
     if (target instanceof Bounds) {
-      min = target.min;
-      max = target.max;
+      min = target.topLeft;
+      max = target.bottomRight;
     } else {
       min = max = target;
     }
 
     return (
-      min.x >= this.min.x &&
-      max.x <= this.max.x &&
-      min.y >= this.min.y &&
-      max.y <= this.max.y
+      min.x >= this.topLeft.x &&
+      max.x <= this.bottomRight.x &&
+      min.y >= this.topLeft.y &&
+      max.y <= this.bottomRight.y
     );
   }
 
@@ -128,10 +128,10 @@ export class Bounds {
   // Returns `true` if the rectangle intersects the given bounds. Two bounds
   // intersect if they have at least one point in common.
   intersects(bounds: Bounds) {
-    const min = this.min,
-      max = this.max,
-      min2 = bounds.min,
-      max2 = bounds.max,
+    const min = this.topLeft,
+      max = this.bottomRight,
+      min2 = bounds.topLeft,
+      max2 = bounds.bottomRight,
       xIntersects = max2.x >= min.x && min2.x <= max.x,
       yIntersects = max2.y >= min.y && min2.y <= max.y;
 
@@ -142,10 +142,10 @@ export class Bounds {
   // Returns `true` if the rectangle overlaps the given bounds. Two bounds
   // overlap if their intersection is an area.
   overlaps(bounds: Bounds) {
-    const min = this.min,
-      max = this.max,
-      min2 = bounds.min,
-      max2 = bounds.max,
+    const min = this.topLeft,
+      max = this.bottomRight,
+      min2 = bounds.topLeft,
+      max2 = bounds.bottomRight,
       xOverlaps = max2.x > min.x && min2.x < max.x,
       yOverlaps = max2.y > min.y && min2.y < max.y;
 
@@ -155,7 +155,7 @@ export class Bounds {
   // @method isValid(): Boolean
   // Returns `true` if the bounds are properly initialized.
   isValid() {
-    return !!(this.min && this.max);
+    return !!(this.topLeft && this.bottomRight);
   }
 
   // @method pad(bufferRatio: Number): Bounds
@@ -163,8 +163,8 @@ export class Bounds {
   // For example, a ratio of 0.5 extends the bounds by 50% in each direction.
   // Negative values will retract the bounds.
   pad(bufferRatio: number) {
-    const min = this.min,
-      max = this.max,
+    const min = this.topLeft,
+      max = this.bottomRight,
       heightBuffer = Math.abs(min.x - max.x) * bufferRatio,
       widthBuffer = Math.abs(min.y - max.y) * bufferRatio;
 
@@ -185,8 +185,8 @@ export class Bounds {
     }
 
     return (
-      this.min.equals(bounds.getTopLeft()) &&
-      this.max.equals(bounds.getBottomRight())
+      this.topLeft.equals(bounds.getTopLeft()) &&
+      this.bottomRight.equals(bounds.getBottomRight())
     );
   }
 }

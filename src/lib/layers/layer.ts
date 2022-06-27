@@ -3,7 +3,10 @@ import { DomEvent } from '../core/dom/domEvent/DomEvent';
 import { Popup } from '../popup/Popup';
 import { CoreUtil } from '../utils/core.util';
 import { Path } from './vector/Path';
-
+export interface LayerOptions {
+  pane?: string | undefined;
+  attribution?: string | undefined;
+}
 export abstract class Layer extends Accessor {
   pane = 'overlayerPane';
   attribution = null;
@@ -14,8 +17,8 @@ export abstract class Layer extends Accessor {
   _zoomAnimated: any;
   _popup: any;
   private _popupHandlersAdded: boolean;
-  constructor() {
-    super();
+  constructor(options?: LayerOptions) {
+    super(options);
   }
 
   /* @section
@@ -66,7 +69,9 @@ export abstract class Layer extends Accessor {
     return this;
   }
 
-  abstract getEvents();
+  getEvents() {
+    return null;
+  }
 
   // @method getAttribution: String
   // Used by the `attribution control`, returns the [attribution option](#gridlayer-attribution).
@@ -85,8 +90,8 @@ export abstract class Layer extends Accessor {
     this._map = map;
     this._zoomAnimated = map._zoomAnimated;
 
-    if (this.getEvents) {
-      const events = this.getEvents();
+    const events = this.getEvents();
+    if (events) {
       map.on(events, this);
       this.once(
         'remove',
@@ -96,7 +101,6 @@ export abstract class Layer extends Accessor {
         this
       );
     }
-
     this.onAdd(map);
 
     this.fire('add');

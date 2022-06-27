@@ -71,8 +71,8 @@ export abstract class CRS {
 
     const b = this.projection.getBounds(),
       s = this.scale(zoom),
-      min = this.transformation.transform(b.min, s),
-      max = this.transformation.transform(b.max, s);
+      min = this.transformation.transform(b.topLeft, s),
+      max = this.transformation.transform(b.bottomRight, s);
 
     return new Bounds({ topLeft: min, bottomRight: max });
   }
