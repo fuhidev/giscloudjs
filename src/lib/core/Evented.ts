@@ -11,7 +11,7 @@ export class Evented {
   private events = new Map<string, IEvent[]>();
   private _firingCount = 0;
   private eventParents = new Map<string, Evented>();
-  on(types, fn, context?) {
+  on(types, fn?, context?) {
     if (typeof types === 'object') {
       for (const type in types) {
         // we don't process space-separated events here for performance;
@@ -56,7 +56,7 @@ export class Evented {
       this.events.set(type, values);
     }
   }
-  off(types, fn, context?) {
+  off(types, fn?, context?) {
     if (!arguments.length) {
       // clear all listeners if called without arguments
       this.events.clear();
