@@ -57,7 +57,7 @@ const eventsKey = '_leaflet_events';
 // @alternative
 // @function off(el: HTMLElement): this
 // Removes all previously added listeners from given HTMLElement
-export function off(obj, types, fn, context?) {
+export function off(obj, types?, fn?, context?) {
   if (arguments.length === 1) {
     batchRemove(obj);
     delete obj[eventsKey];

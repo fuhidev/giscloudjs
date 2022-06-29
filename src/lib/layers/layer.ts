@@ -13,7 +13,6 @@ export abstract class Layer extends Accessor {
   bubblingMouseEvents = true;
   _map: any;
   _mapToAdd: any;
-  options: any;
   _zoomAnimated: any;
   _popup: any;
   private _popupHandlersAdded: boolean;
@@ -54,9 +53,7 @@ export abstract class Layer extends Accessor {
   // @method getPane(name? : String): HTMLElement
   // Returns the `HTMLElement` representing the named pane on the map. If `name` is omitted, returns the pane for this layer.
   getPane(name?: string) {
-    return this._map.getPane(
-      name ? this.options[name] || name : this.options.pane
-    );
+    return this._map.getPane(name ? this[name] || name : this.pane);
   }
 
   addInteractiveTarget(targetEl) {
@@ -76,7 +73,7 @@ export abstract class Layer extends Accessor {
   // @method getAttribution: String
   // Used by the `attribution control`, returns the [attribution option](#gridlayer-attribution).
   getAttribution() {
-    return this.options.attribution;
+    return this.attribution;
   }
 
   _layerAdd(e) {

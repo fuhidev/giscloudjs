@@ -38,7 +38,7 @@ export class Bounds extends Accessor {
   // @property max: Point
   bottomRight: Point;
   // The bottom right corner of the rectangle.
-  constructor(options: BoundsOptions) {
+  constructor(options?: BoundsOptions) {
     super(options);
   }
 
