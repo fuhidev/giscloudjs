@@ -9,8 +9,8 @@ import { CoreUtil } from '../../../utils/core.util';
 import { StringUtil } from '../../../utils/string.util';
 import Browser from '../../Browser';
 import { DomUtil } from '../DomUtil';
-import { removeDoubleTapListener } from './DoubleTap.DomEvent';
-import { addPointerListener, removePointerListener } from './Pointer.DomEvent';
+import { DoubleTapDomEvent } from './DoubleTap.DomEvent';
+import { PointerDomEvent } from './Pointer.DomEvent';
 
 // Inspired by John Resig, Dean Edwards and YUI addEvent implementations.
 
@@ -23,7 +23,7 @@ import { addPointerListener, removePointerListener } from './Pointer.DomEvent';
 // @alternative
 // @function on(el: HTMLElement, eventMap: Object, context?: Object): this
 // Adds a set of type/listener pairs, e.g. `{click: onClick, mousemove: onMouseMove}`
-export function on(obj, types, fn?, context?) {
+function on(obj, types, fn?, context?) {
   if (types && typeof types === 'object') {
     for (const type in types) {
       addOne(obj, type, types[type], fn);
@@ -57,7 +57,7 @@ const eventsKey = '_leaflet_events';
 // @alternative
 // @function off(el: HTMLElement): this
 // Removes all previously added listeners from given HTMLElement
-export function off(obj, types?, fn?, context?) {
+function off(obj, types?, fn?, context?) {
   if (arguments.length === 1) {
     batchRemove(obj);
     delete obj[eventsKey];
@@ -105,7 +105,7 @@ function addOne(obj, type, fn, context?) {
     return this;
   }
 
-  let handler = function (e) {
+  let handler: any = function (e) {
     return fn.call(context || obj, e || window.event);
   };
 
@@ -113,9 +113,9 @@ function addOne(obj, type, fn, context?) {
 
   if (!Browser.touchNative && Browser.pointer && type.indexOf('touch') === 0) {
     // Needs DomEvent.Pointer.js
-    handler = addPointerListener(obj, type, handler);
+    handler = PointerDomEvent.addPointerListener(obj, type, handler);
   } else if (Browser.touch && type === 'dblclick') {
-    handler = addDoubleTapListener(obj, handler);
+    handler = DoubleTapDomEvent.addDoubleTapListener(obj, handler);
   } else if ('addEventListener' in obj) {
     if (
       type === 'touchstart' ||
@@ -158,9 +158,9 @@ function removeOne(obj, type, fn, context, id?) {
   }
 
   if (!Browser.touchNative && Browser.pointer && type.indexOf('touch') === 0) {
-    removePointerListener(obj, type, handler);
+    PointerDomEvent.removePointerListener(obj, type, handler);
   } else if (Browser.touch && type === 'dblclick') {
-    removeDoubleTapListener(obj, handler);
+    DoubleTapDomEvent.removeDoubleTapListener(obj, handler);
   } else if ('removeEventListener' in obj) {
     obj.removeEventListener(mouseSubst[type] || type, handler, false);
   } else {
@@ -177,7 +177,7 @@ function removeOne(obj, type, fn, context, id?) {
 // 	L.DomEvent.stopPropagation(ev);
 // });
 // ```
-export function stopPropagation(e) {
+function stopPropagation(e) {
   if (e.stopPropagation) {
     e.stopPropagation();
   } else if (e.originalEvent) {
@@ -192,7 +192,7 @@ export function stopPropagation(e) {
 
 // @function disableScrollPropagation(el: HTMLElement): this
 // Adds `stopPropagation` to the element's `'wheel'` events (plus browser constiants).
-export function disableScrollPropagation(el) {
+function disableScrollPropagation(el) {
   addOne(el, 'wheel', stopPropagation);
   return this;
 }
@@ -200,7 +200,7 @@ export function disableScrollPropagation(el) {
 // @function disableClickPropagation(el: HTMLElement): this
 // Adds `stopPropagation` to the element's `'click'`, `'dblclick'`, `'contextmenu'`,
 // `'mousedown'` and `'touchstart'` events (plus browser constiants).
-export function disableClickPropagation(el) {
+function disableClickPropagation(el) {
   on(el, 'mousedown touchstart dblclick contextmenu', stopPropagation);
   el['_leaflet_disable_click'] = true;
   return this;
@@ -211,7 +211,7 @@ export function disableClickPropagation(el) {
 // following a link in the href of the a element, or doing a POST request
 // with page reload when a `<form>` is submitted).
 // Use it inside listener functions.
-export function preventDefault(e) {
+function preventDefault(e) {
   if (e.preventDefault) {
     e.preventDefault();
   } else {
@@ -222,7 +222,7 @@ export function preventDefault(e) {
 
 // @function stop(ev: DOMEvent): this
 // Does `stopPropagation` and `preventDefault` at the same time.
-export function stop(e) {
+function stop(e) {
   preventDefault(e);
   stopPropagation(e);
   return this;
@@ -232,7 +232,7 @@ export function stop(e) {
 // Compatibility polyfill for [`Event.composedPath()`](https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath).
 // Returns an array containing the `HTMLElement`s that the given DOM event
 // should propagate to (if not stopped).
-export function getPropagationPath(ev) {
+function getPropagationPath(ev) {
   if (ev.composedPath) {
     return ev.composedPath();
   }
@@ -250,7 +250,7 @@ export function getPropagationPath(ev) {
 // @function getMousePosition(ev: DOMEvent, container?: HTMLElement): Point
 // Gets normalized mouse position from a DOM event relative to the
 // `container` (border excluded) or to the whole page if not specified.
-export function getMousePosition(e, container) {
+function getMousePosition(e, container) {
   if (!container) {
     return new Point({ x: e.clientX, y: e.clientY });
   }
@@ -282,7 +282,7 @@ const wheelPxFactor =
 // pixels scrolled (negative if scrolling down).
 // Events from pointing devices without precise scrolling are mapped to
 // a best guess of 60 pixels.
-export function getWheelDelta(e) {
+function getWheelDelta(e) {
   return Browser.edge
     ? e.wheelDeltaY / 2 // Don't trust window-geometry-based delta
     : e.deltaY && e.deltaMode === 0
@@ -303,7 +303,7 @@ export function getWheelDelta(e) {
 }
 
 // check if element really left/entered the event target (for mouseenter/mouseleave)
-export function isExternalTarget(el, e) {
+function isExternalTarget(el, e) {
   let related = e.relatedTarget;
 
   if (!related) {
@@ -320,22 +320,11 @@ export function isExternalTarget(el, e) {
   return related !== el;
 }
 
-// @function addListener(…): this
-// Alias to [`L.DomEvent.on`](#domevent-on)
-export { on as addListener };
-// @function removeListener(…): this
-// Alias to [`L.DomEvent.off`](#domevent-off)
-export { off as removeListener };
-function addDoubleTapListener(
-  obj: any,
-  handler: (e: any) => any
-): (e: any) => any {
-  throw new Error('Function not implemented.');
-}
-
 export const DomEvent = {
   on,
   off,
+  addListener: on,
+  removeListener: off,
   stopPropagation,
   disableScrollPropagation,
   disableClickPropagation,

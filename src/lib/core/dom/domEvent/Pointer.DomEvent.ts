@@ -1,5 +1,5 @@
 import Browser from '../../Browser';
-import * as DomEvent from './DomEvent';
+import { DomEvent } from './DomEvent';
 
 /*
  * Extends L.DomEvent to provide touch support for Internet Explorer and Windows-based devices.
@@ -27,7 +27,7 @@ let _pointerDocListener = false;
 // Provides a touch events wrapper for (ms)pointer events.
 // ref https://www.w3.org/TR/pointerevents/ https://www.w3.org/Bugs/Public/show_bug.cgi?id=22890
 
-export function addPointerListener(obj, type, handler) {
+function addPointerListener(obj, type, handler) {
   if (type === 'touchstart') {
     _addPointerDocListener();
   }
@@ -42,7 +42,7 @@ export function addPointerListener(obj, type, handler) {
   return handler;
 }
 
-export function removePointerListener(obj, type, handler) {
+function removePointerListener(obj, type, handler) {
   if (!pEvent[type]) {
     console.warn('wrong event specified:', type);
     return;
@@ -98,3 +98,8 @@ function _onPointerStart(handler, e) {
   }
   _handlePointer(handler, e);
 }
+
+export const PointerDomEvent = {
+  addPointerListener,
+  removePointerListener,
+};

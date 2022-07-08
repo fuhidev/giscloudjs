@@ -1,11 +1,11 @@
-import * as DomEvent from './DomEvent';
-
 /*
  * Extends the event handling code with double tap support for mobile browsers.
  *
  * Note: currently most browsers fire native dblclick, with only a few exceptions
  * (see https://github.com/Leaflet/Leaflet/issues/7012#issuecomment-595087386)
  */
+
+import { DomEvent } from './DomEvent';
 
 function makeDblclick(event) {
   // in modern browsers `type` cannot be just overridden:
@@ -25,7 +25,7 @@ function makeDblclick(event) {
 }
 
 const delay = 200;
-export function addDoubleTapListener(obj, handler) {
+function addDoubleTapListener(obj, handler) {
   // Most browsers handle double tap natively
   obj.addEventListener('dblclick', handler);
 
@@ -86,7 +86,12 @@ export function addDoubleTapListener(obj, handler) {
   };
 }
 
-export function removeDoubleTapListener(obj, handlers) {
+function removeDoubleTapListener(obj, handlers) {
   obj.removeEventListener('dblclick', handlers.dblclick);
   obj.removeEventListener('click', handlers.simDblclick);
 }
+
+export const DoubleTapDomEvent = {
+  addDoubleTapListener,
+  removeDoubleTapListener,
+};

@@ -19,6 +19,7 @@ import { CoreUtil } from '../utils/core.util';
 import { BoxZoom } from './handler/Map.BoxZoom';
 import { DoubleClickZoom } from './handler/Map.DoubleClickZoom';
 import { Drag } from './handler/Map.Drag';
+import { Keyboard } from './handler/Map.Keyboard';
 
 export interface ZoomOptions {
   animate?: boolean;
@@ -209,6 +210,7 @@ export class DMap extends Accessor {
     this.addHandler('boxzoom', BoxZoom);
     this.addHandler('doubleClickZoom', DoubleClickZoom);
     this.addHandler('dragging', Drag);
+    this.addHandler('keyboard', Keyboard);
 
     this.addMany(this.options.layers);
   }
