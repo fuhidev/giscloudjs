@@ -37,6 +37,8 @@ export class Bounds extends Accessor {
   topLeft: Point;
   // @property max: Point
   bottomRight: Point;
+  min: any;
+  max: any;
   // The bottom right corner of the rectangle.
   constructor(options?: BoundsOptions) {
     super(options);

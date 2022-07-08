@@ -149,7 +149,7 @@ export class DMap extends Accessor {
   _zoomBoundLayers: any;
   _popup: any;
   private _paneRenderers: any;
-  constructor(container: HTMLDivElement, options: MapOptions) {
+  constructor(container: string, options?: MapOptions) {
     super(options);
     this.crs = new EPSG3857();
     if (options.center) {
@@ -1349,7 +1349,7 @@ export class DMap extends Accessor {
 
   // map initialization methods
 
-  private _initContainer(id: HTMLDivElement) {
+  private _initContainer(id: string) {
     const container = (this._container = DomUtil.get(id));
 
     if (!container) {

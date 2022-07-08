@@ -64,9 +64,40 @@ function cancelAnimFrame(id: number) {
     cancelFn.call(window, id);
   }
 }
+
+function throttle(fn, time, context, ...argument) {
+  let lock, args;
+  const later = function () {
+    // reset lock and call if queued
+    lock = false;
+    if (args) {
+      wrapperFn.apply(context, args);
+      args = false;
+    }
+  };
+
+  const wrapperFn = function () {
+    if (lock) {
+      // called too soon, queue to call later
+      args = argument;
+    } else {
+      // call and lock until later
+      fn.apply(context, argument);
+      setTimeout(later, time);
+      lock = true;
+    }
+  };
+
+  return wrapperFn;
+}
+function falseFn() {
+  return false;
+}
 export const CoreUtil = {
   stamp,
   bind,
   cancelAnimFrame,
   requestAnimFrame,
+  throttle,
+  falseFn,
 };

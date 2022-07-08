@@ -37,6 +37,7 @@ export class Point extends Geometry {
   x = 0;
   // @property y: Number; The `y` coordinate of the point
   y = 0;
+  z: number;
   constructor(options?: PointOptions | Point) {
     super(options);
   }
