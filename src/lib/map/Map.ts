@@ -22,6 +22,7 @@ import { Drag } from './handler/Map.Drag';
 import { Keyboard } from './handler/Map.Keyboard';
 import { ScrollWheelZoom } from './handler/Map.ScrollWheelZoom';
 import { TapHold } from './handler/Map.TapHold';
+import { TouchZoom } from './handler/Map.TouchZoom';
 
 export interface ZoomOptions {
   animate?: boolean;
@@ -143,7 +144,7 @@ export class DMap extends Accessor {
   private _initControlPos: any;
   private _targets = new Map<string, any>();
   boxZoom: any;
-  private _animatingZoom: boolean;
+  _animatingZoom: boolean;
   private _animateToCenter: any;
   private _animateToZoom: any;
   private _tempFireZoomEvent: any;
@@ -215,6 +216,7 @@ export class DMap extends Accessor {
     this.addHandler('keyboard', Keyboard);
     this.addHandler('scrollWheelZoom', ScrollWheelZoom);
     this.addHandler('tapHold', TapHold);
+    this.addHandler('touchZoom', TouchZoom);
 
     this.addMany(this.options.layers);
   }
@@ -1949,7 +1951,7 @@ export class DMap extends Accessor {
 
     this.on(
       'zoomanim',
-      function (e) {
+      (e) => {
         const prop = DomUtil.TRANSFORM,
           transform = this._proxy.style[prop];
 
