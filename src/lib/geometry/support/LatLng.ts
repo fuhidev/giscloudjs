@@ -11,10 +11,10 @@ export interface LatLngOptions {
 }
 
 export class LatLng extends Accessor {
-  lat: number;
-  lng: number;
+  lat = 0;
+  lng = 0;
   alt?: number;
-  constructor(options: LatLngOptions) {
+  constructor(options?: LatLngOptions) {
     super(options);
   }
 

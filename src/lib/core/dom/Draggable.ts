@@ -25,8 +25,7 @@ const START = Browser.touch ? 'touchstart mousedown' : 'mousedown';
 export interface DraggableOptions {
   element: HTMLElement;
   dragStartTarget: HTMLElement;
-  preventOutline;
-  options;
+  preventOutline?: boolean;
 }
 
 export class Draggable extends Evented {

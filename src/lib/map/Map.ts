@@ -18,6 +18,7 @@ import { ArrayUtil } from '../utils/array.utils';
 import { CoreUtil } from '../utils/core.util';
 import { BoxZoom } from './handler/Map.BoxZoom';
 import { DoubleClickZoom } from './handler/Map.DoubleClickZoom';
+import { Drag } from './handler/Map.Drag';
 
 export interface ZoomOptions {
   animate?: boolean;
@@ -94,6 +95,10 @@ export interface MapOptions {
  *
  */
 export class DMap extends Accessor {
+  private _flyToFrame: number;
+  _limitOffset(offset: any, maxBounds: any): any {
+    throw new Error('Method not implemented.');
+  }
   crs: CRS;
   center: LatLng;
   zoom: number;
@@ -203,6 +208,7 @@ export class DMap extends Accessor {
 
     this.addHandler('boxzoom', BoxZoom);
     this.addHandler('doubleClickZoom', DoubleClickZoom);
+    this.addHandler('dragging', Drag);
 
     this.addMany(this.options.layers);
   }
@@ -1181,7 +1187,7 @@ export class DMap extends Accessor {
   // @method getPixelWorldBounds(zoom?: Number): Bounds
   // Returns the world's bounds in pixel coordinates for zoom level `zoom`.
   // If `zoom` is omitted, the map's current zoom level is used.
-  getPixelWorldBounds(zoom) {
+  getPixelWorldBounds(zoom?: number) {
     return this.crs.getProjectedBounds(
       zoom === undefined ? this.getZoom() : zoom
     );
@@ -1391,6 +1397,10 @@ export class DMap extends Accessor {
     }
   }
 
+  getMapPane() {
+    return this.getPane('mapPane');
+  }
+
   private _initPanes() {
     // @section
     //
@@ -1530,9 +1540,6 @@ export class DMap extends Accessor {
       this._panAnim.stop();
     }
     return this;
-  }
-  private _flyToFrame(_flyToFrame: any) {
-    throw new Error('Method not implemented.');
   }
 
   private _rawPanBy(offset) {

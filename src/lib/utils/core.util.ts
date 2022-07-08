@@ -52,7 +52,11 @@ function bind(fn, obj, ...arguments) {
   };
 }
 
-function requestAnimFrame(fn, context, immediate?) {
+function requestAnimFrame(
+  fn: (timestamp: number) => void,
+  context?: any,
+  immediate?: boolean
+): number {
   if (immediate && requestFn === timeoutDefer) {
     fn.call(context);
   } else {
@@ -62,7 +66,7 @@ function requestAnimFrame(fn, context, immediate?) {
 
 // @function cancelAnimFrame(id: Number): undefined
 // Cancels a previous `requestAnimFrame`. See also [window.cancelAnimationFrame](https://developer.mozilla.org/docs/Web/API/window/cancelAnimationFrame).
-function cancelAnimFrame(id) {
+function cancelAnimFrame(id: number) {
   if (id) {
     cancelFn.call(window, id);
   }
