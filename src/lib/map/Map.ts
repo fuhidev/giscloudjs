@@ -9,10 +9,15 @@ import { Point } from '../geometry/Point';
 import { LatLng } from '../geometry/support/LatLng';
 import { LatLngBounds } from '../geometry/support/LatLngBounds';
 import { Layer } from '../layers/Layer';
+import { Canvas } from '../layers/vector/Canvas';
+import { SVG } from '../layers/vector/SVG';
+import { Popup } from '../popup/Popup';
 import { CRS } from '../projections/crs/CRS';
 import { EPSG3857 } from '../projections/crs/EPSG3857.CRS';
 import { ArrayUtil } from '../utils/array.utils';
 import { CoreUtil } from '../utils/core.util';
+import { BoxZoom } from './handler/Map.BoxZoom';
+import { DoubleClickZoom } from './handler/Map.DoubleClickZoom';
 
 export interface ZoomOptions {
   animate?: boolean;
@@ -195,6 +200,9 @@ export class DMap extends Accessor {
         this
       );
     }
+
+    this.addHandler('boxzoom', BoxZoom);
+    this.addHandler('doubleClickZoom', DoubleClickZoom);
 
     this.addMany(this.options.layers);
   }
@@ -406,7 +414,7 @@ export class DMap extends Accessor {
   // @alternative
   // @method setZoomAround(offset: Point, zoom: Number, options: Zoom options): this
   // Zooms the map while keeping a specified pixel on the map (relative to the top-left corner) stationary.
-  setZoomAround(latlng: LatLng, zoom: number, options) {
+  setZoomAround(latlng: LatLng, zoom: number, options?: ZoomOptions) {
     const scale = this.getZoomScale(zoom),
       viewHalf = this.getSize().divideBy(2),
       containerPoint =
@@ -505,7 +513,7 @@ export class DMap extends Accessor {
     // and makes them disappear or appear in the wrong place (slightly offset) #2602
     if (options.animate !== true && !this.getSize().contains(offset)) {
       this._resetView(
-        this.unproject(this.project(this.getCenter()).add(new Point(offset))),
+        this.unproject(this.project(this.getCenter()).add(offset)),
         this.getZoom()
       );
       return this;
@@ -2106,6 +2114,8 @@ export class DMap extends Accessor {
     // @namespace Map; @option preferCanvas: Boolean = false
     // Whether `Path`s should be rendered on a `Canvas` renderer.
     // By default, all `Path`s are rendered in a `SVG` renderer.
-    return (this.options.preferCanvas && canvas(options)) || svg(options);
+    return (
+      (this.options.preferCanvas && new Canvas(options)) || new SVG(options)
+    );
   }
 }

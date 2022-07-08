@@ -9,12 +9,14 @@ export interface LatLngBoundsOptions {
 export class LatLngBounds extends Accessor {
   southWest: LatLng;
   northEast: LatLng;
-  constructor(options: LatLngBoundsOptions) {
+  constructor(options?: LatLngBoundsOptions) {
     super(options);
-    const latlngs: LatLng[] = [options.southWest, options.northEast];
+    if (options) {
+      const latlngs: LatLng[] = [options.southWest, options.northEast];
 
-    for (let i = 0, len = latlngs.length; i < len; i++) {
-      this.extend(latlngs[i]);
+      for (let i = 0, len = latlngs.length; i < len; i++) {
+        this.extend(latlngs[i]);
+      }
     }
   }
 
@@ -59,10 +61,16 @@ export class LatLngBounds extends Accessor {
       heightBuffer = Math.abs(sw.lat - ne.lat) * bufferRatio,
       widthBuffer = Math.abs(sw.lng - ne.lng) * bufferRatio;
 
-    return new LatLngBounds(
-      new LatLng({ lat: sw.lat - heightBuffer, lng: sw.lng - widthBuffer }),
-      new LatLng({ lat: ne.lat + heightBuffer, lng: ne.lng + widthBuffer })
-    );
+    return new LatLngBounds({
+      southWest: new LatLng({
+        lat: sw.lat - heightBuffer,
+        lng: sw.lng - widthBuffer,
+      }),
+      northEast: new LatLng({
+        lat: ne.lat + heightBuffer,
+        lng: ne.lng + widthBuffer,
+      }),
+    });
   }
 
   // @method getCenter(): LatLng

@@ -29,7 +29,7 @@ export interface PathOptions extends InteractiveLayerOptions, LayerOptions {
   className?: string | undefined;
 }
 
-export class Path extends Layer {
+export abstract class Path extends Layer {
   stroke = true;
   color = '#3388ff';
   weight = 3;
@@ -46,6 +46,7 @@ export class Path extends Layer {
   bubblingMouseEvents = true;
   renderer?: Renderer | undefined;
   className?: string | undefined;
+  protected _path: HTMLElement;
   constructor(options: PathOptions) {
     super(options);
   }
@@ -80,15 +81,8 @@ export class Path extends Layer {
   setStyle(style) {
     if (this.renderer) {
       this.renderer._updateStyle(this);
-      if (
-        this.stroke &&
-        style &&
-        Object.prototype.hasOwnProperty.call(style, 'weight')
-      ) {
-        this._updateBounds();
-      }
+      return this;
     }
-    return this;
   }
 
   // @method bringToFront(): this
@@ -112,6 +106,9 @@ export class Path extends Layer {
   getElement() {
     return this._path;
   }
+
+  abstract _project();
+  abstract _update();
 
   _reset() {
     // defined in child classes

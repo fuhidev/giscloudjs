@@ -2,7 +2,7 @@ import { DMap } from '../map/Map';
 import { Accessor } from './Accessor';
 
 export abstract class Handler extends Accessor {
-  private map: DMap;
+  protected map: DMap;
   private _enabled = false;
   constructor(map: DMap) {
     super();

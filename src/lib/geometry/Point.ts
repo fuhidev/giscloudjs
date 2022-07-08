@@ -29,6 +29,7 @@ import { Geometry } from './Geometry';
 export interface PointOptions {
   x: number;
   y: number;
+  round?: number;
 }
 
 export class Point extends Geometry {
