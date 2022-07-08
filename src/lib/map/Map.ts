@@ -13,7 +13,7 @@ import { SVG } from '../layers/vector/SVG';
 import { Popup } from '../popup/Popup';
 import { CRS } from '../projections/crs/CRS';
 import { EPSG3857 } from '../projections/crs/EPSG3857.CRS';
-import { ArrayUtil } from '../utils/array.utils';
+import { ArrayUtil } from '../utils/array.util';
 import { CoreUtil } from '../utils/core.util';
 import { BoxZoom } from './handler/Map.BoxZoom';
 import { DoubleClickZoom } from './handler/Map.DoubleClickZoom';

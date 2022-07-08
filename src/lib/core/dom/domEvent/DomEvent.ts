@@ -4,7 +4,7 @@
  */
 
 import { Point } from '../../../geometry/Point';
-import { ArrayUtil } from '../../../utils/array.utils';
+import { ArrayUtil } from '../../../utils/array.util';
 import { CoreUtil } from '../../../utils/core.util';
 import { StringUtil } from '../../../utils/string.util';
 import Browser from '../../Browser';
