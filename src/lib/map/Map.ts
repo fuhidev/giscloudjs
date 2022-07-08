@@ -20,6 +20,8 @@ import { BoxZoom } from './handler/Map.BoxZoom';
 import { DoubleClickZoom } from './handler/Map.DoubleClickZoom';
 import { Drag } from './handler/Map.Drag';
 import { Keyboard } from './handler/Map.Keyboard';
+import { ScrollWheelZoom } from './handler/Map.ScrollWheelZoom';
+import { TapHold } from './handler/Map.TapHold';
 
 export interface ZoomOptions {
   animate?: boolean;
@@ -211,6 +213,8 @@ export class DMap extends Accessor {
     this.addHandler('doubleClickZoom', DoubleClickZoom);
     this.addHandler('dragging', Drag);
     this.addHandler('keyboard', Keyboard);
+    this.addHandler('scrollWheelZoom', ScrollWheelZoom);
+    this.addHandler('tapHold', TapHold);
 
     this.addMany(this.options.layers);
   }
@@ -1900,7 +1904,7 @@ export class DMap extends Accessor {
       : Math.max(0, Math.ceil(left)) - Math.max(0, Math.floor(right));
   }
 
-  private _limitZoom(zoom) {
+  _limitZoom(zoom) {
     const min = this.getMinZoom(),
       max = this.getMaxZoom(),
       snap = Browser.any3d ? this.options.zoomSnap : 1;
