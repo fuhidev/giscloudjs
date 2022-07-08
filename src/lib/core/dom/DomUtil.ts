@@ -12,7 +12,7 @@
 import { Point } from '../../geometry/Point';
 import { StringUtil } from '../../utils/string.util';
 import Browser from '../Browser';
-import * as DomEvent from './domEvent/DomEvent';
+import { DomEvent } from './domEvent/DomEvent';
 
 // @property TRANSFORM: String
 // Vendor-prefixed transform style name (e.g. `'webkitTransform'` for WebKit).

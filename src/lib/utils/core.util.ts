@@ -34,7 +34,7 @@ const cancelFn =
     window.clearTimeout(id);
   };
 /*eslint-disabled no-shadow-restricted-names: "error"*/
-function bind(fn, obj, ...arguments) {
+function bind(fn, obj) {
   const slice = Array.prototype.slice;
 
   if (fn.bind) {
