@@ -75,6 +75,7 @@ export class BoxZoom extends Handler {
       },
       this
     );
+    return true;
   }
 
   _onMouseMove(e) {

@@ -28,11 +28,12 @@ export class Canvas extends Renderer {
   }
 
   onAdd() {
-    Renderer.prototype.onAdd.call(this);
+    super.onAdd();
 
     // Redraw vectors since canvas is cleared upon removal,
     // in case of removing the renderer itself from the map.
     this._draw();
+    return this;
   }
 
   _initContainer() {

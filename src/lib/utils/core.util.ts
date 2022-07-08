@@ -1,10 +1,5 @@
-/* eslint-disable prefer-rest-params */
-// @property lastId: Number
-// Last unique ID used by [`stamp()`](#util-stamp)
 let lastId = 0;
 ('use strict');
-// @function stamp(obj: Object): Number
-// Returns the unique ID of an object, assigning it one if it doesn't have it.
 function stamp(obj) {
   if (!('_leaflet_id' in obj)) {
     obj['_leaflet_id'] = ++lastId;
@@ -34,21 +29,18 @@ const cancelFn =
     window.clearTimeout(id);
   };
 /*eslint-disabled no-shadow-restricted-names: "error"*/
-function bind(fn, obj) {
+function bind(fn, obj, ...args: any[]) {
   const slice = Array.prototype.slice;
 
   if (fn.bind) {
     // eslint-disable-next-line prefer-spread
-    return fn.bind.apply(fn, slice.call(arguments, 1));
+    return fn.bind.apply(fn, slice.call(args, 1));
   }
 
-  const args = slice.call(arguments, 2);
+  const argus = slice.call(args, 2);
 
   return function () {
-    return fn.apply(
-      obj,
-      args.length ? args.concat(slice.call(arguments)) : arguments
-    );
+    return fn.apply(obj, argus.length ? argus.concat(slice.call(args)) : args);
   };
 }
 
@@ -59,6 +51,7 @@ function requestAnimFrame(
 ): number {
   if (immediate && requestFn === timeoutDefer) {
     fn.call(context);
+    return 0;
   } else {
     return requestFn.call(window, bind(fn, context));
   }

@@ -1,6 +1,5 @@
 import { Accessor } from '../core/Accessor';
 import Browser from '../core/Browser';
-import { Collection } from '../core/collections/Collection';
 import { DomEvent } from '../core/dom/domEvent/DomEvent';
 import { DomUtil } from '../core/dom/DomUtil';
 import { PosAnimation } from '../core/dom/PosAnimation';
@@ -65,7 +64,7 @@ export interface LocateOptions {
 }
 export interface MapOptions {
   crs: CRS;
-  layers: Collection<Layer>;
+  layers: Layer[];
   center: LatLng | [number, number];
   zoom: number;
   minZoom: number;
@@ -100,9 +99,6 @@ export interface MapOptions {
  */
 export class DMap extends Accessor {
   private _flyToFrame: number;
-  _limitOffset(offset: any, maxBounds: any): any {
-    throw new Error('Method not implemented.');
-  }
   crs: CRS;
   center: LatLng;
   zoom: number;
@@ -218,7 +214,7 @@ export class DMap extends Accessor {
     this.addHandler('tapHold', TapHold);
     this.addHandler('touchZoom', TouchZoom);
 
-    this.addMany(this.options.layers);
+    this._addLayers(this.options.layers);
   }
   // @method addLayer(layer: Layer): this
   // Adds the given layer to the map
@@ -357,13 +353,6 @@ export class DMap extends Accessor {
     ) {
       this.setZoom(this._layersMinZoom);
     }
-  }
-  add(layer: Layer) {
-    //
-  }
-
-  addMany(layers: Layer[]) {
-    //
   }
   // @section Methods for modifying map state
 
@@ -1693,6 +1682,7 @@ export class DMap extends Accessor {
       }
       el = el.parentNode;
     }
+    return false;
   }
 
   private _handleDOMEvent(e) {
@@ -1971,10 +1961,7 @@ export class DMap extends Accessor {
 
     this.on('load moveend', this._animMoveEnd, this);
 
-    this._on('unload', this._destroyAnimProxy, this);
-  }
-  private _on(arg0: string, _destroyAnimProxy: () => void, arg2: this) {
-    throw new Error('Method not implemented.');
+    this.on('unload', this._destroyAnimProxy, this);
   }
 
   private _destroyAnimProxy() {
@@ -2132,5 +2119,19 @@ export class DMap extends Accessor {
     return (
       (this.options.preferCanvas && new Canvas(options)) || new SVG(options)
     );
+  }
+
+  _limitOffset(offset, bounds) {
+    if (!bounds) {
+      return offset;
+    }
+
+    const viewBounds = this.getPixelBounds(),
+      newBounds = new Bounds({
+        topLeft: viewBounds.topLeft.add(offset),
+        bottomRight: viewBounds.bottomRight.add(offset),
+      });
+
+    return offset.add(this._getBoundsOffset(newBounds, bounds));
   }
 }

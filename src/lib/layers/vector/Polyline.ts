@@ -23,6 +23,7 @@ export class Polyline extends Path {
   options: any;
   constructor(latlngs: LatLng[] | LatLng[][], options?: PolylineOptions) {
     super(options);
+    this.setLatLngs(latlngs);
   }
   // @method getLatLngs(): LatLng[]
   // Returns an array of the points in the path, or nested arrays of points in case of multi-polyline.

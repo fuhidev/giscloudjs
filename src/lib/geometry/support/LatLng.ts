@@ -41,7 +41,7 @@ export class LatLng extends Accessor {
   // @method distanceTo(otherLatLng: LatLng): Number
   // Returns the distance (in meters) to the given `LatLng` calculated using the [Spherical Law of Cosines](https://en.wikipedia.org/wiki/Spherical_law_of_cosines).
   distanceTo(other: LatLng) {
-    return EarthCRS.distance(this, other);
+    return new EarthCRS().distance(this, other);
   }
 
   // @method wrap(): LatLng
@@ -55,10 +55,16 @@ export class LatLng extends Accessor {
   toBounds(sizeInMeters) {
     const latAccuracy = (180 * sizeInMeters) / 40075017,
       lngAccuracy = latAccuracy / Math.cos((Math.PI / 180) * this.lat);
-    return new LatLngBounds(
-      new LatLng({ lat: this.lat - latAccuracy, lng: this.lng - lngAccuracy }),
-      new LatLng({ lat: this.lat + latAccuracy, lng: this.lng + lngAccuracy })
-    );
+    return new LatLngBounds({
+      southWest: new LatLng({
+        lat: this.lat - latAccuracy,
+        lng: this.lng - lngAccuracy,
+      }),
+      northEast: new LatLng({
+        lat: this.lat + latAccuracy,
+        lng: this.lng + lngAccuracy,
+      }),
+    });
   }
 
   clone() {

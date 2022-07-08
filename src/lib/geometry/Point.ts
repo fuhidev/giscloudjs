@@ -33,9 +33,6 @@ export interface PointOptions {
 }
 
 export class Point extends Geometry {
-  _divideBy(arg0: number): Point {
-    throw new Error('Method not implemented.');
-  }
   // @property x: Number; The `x` coordinate of the point
   x = 0;
   // @property y: Number; The `y` coordinate of the point

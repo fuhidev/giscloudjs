@@ -61,6 +61,7 @@ export abstract class Path extends Layer {
     this.renderer._initPath(this);
     this._reset();
     this.renderer._addPath(this);
+    return this;
   }
 
   onRemove() {
@@ -78,11 +79,11 @@ export abstract class Path extends Layer {
 
   // @method setStyle(style: Path options): this
   // Changes the appearance of a Path based on the options in the `Path options` object.
-  setStyle(style) {
+  setStyle() {
     if (this.renderer) {
       this.renderer._updateStyle(this);
-      return this;
     }
+    return this;
   }
 
   // @method bringToFront(): this

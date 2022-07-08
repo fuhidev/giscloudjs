@@ -1,5 +1,6 @@
 import { Accessor } from '../core/Accessor';
 import { DomEvent } from '../core/dom/domEvent/DomEvent';
+import { DMap } from '../map/Map';
 import { Popup } from '../popup/Popup';
 import { CoreUtil } from '../utils/core.util';
 import { Path } from './vector/Path';
@@ -103,9 +104,8 @@ export abstract class Layer extends Accessor {
     this.fire('add');
     map.fire('layeradd', { layer: this });
   }
-  onAdd(map: any) {
-    throw new Error('Method not implemented.');
-  }
+
+  abstract onAdd(map: DMap);
 
   _initOverlay(OverlayClass, old, content, options) {
     let overlay = content;

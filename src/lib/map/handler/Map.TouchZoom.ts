@@ -53,7 +53,7 @@ export class TouchZoom extends Handler {
     this._startLatLng = map.containerPointToLatLng(this._centerPoint);
     if (map.options.touchZoom !== 'center') {
       this._pinchStartLatLng = map.containerPointToLatLng(
-        p1.add(p2)._divideBy(2)
+        p1.add(p2).divideBy(2)
       );
     }
 

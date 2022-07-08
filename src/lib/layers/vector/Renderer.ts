@@ -37,6 +37,7 @@ export abstract class Renderer extends Layer {
     this.getPane().appendChild(this._container);
     this._update();
     this.on('update', this._updatePaths, this);
+    return this;
   }
 
   onRemove() {
@@ -71,7 +72,7 @@ export abstract class Renderer extends Layer {
 
   _updateTransform(center, zoom) {
     const scale = this._map.getZoomScale(zoom, this._zoom),
-      viewHalf = this._map.getSize().multiplyBy(0.5 + this.options.padding),
+      viewHalf = this._map.getSize().multiplyBy(0.5 + this.padding),
       currentCenterPoint = this._map.project(this._center, zoom),
       topLeftOffset = viewHalf
         .multiplyBy(-scale)
@@ -109,7 +110,7 @@ export abstract class Renderer extends Layer {
   _update() {
     // Update pixel bounds of renderer container (for positioning/sizing/clipping later)
     // Subclasses are responsible of firing the 'update' event.
-    const p = this.options.padding,
+    const p = this.padding,
       size = this._map.getSize(),
       min = this._map.containerPointToLayerPoint(size.multiplyBy(-p)).round();
 
